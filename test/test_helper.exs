@@ -48,48 +48,48 @@ run_cmd = fn cmd ->
 end
 
 sql = """
-DROP ROLE IF EXISTS postgrex_cleartext_pw;
-DROP ROLE IF EXISTS postgrex_md5_pw;
+DROP USER IF EXISTS postgrex_cleartext_pw;
+DROP USER IF EXISTS postgrex_md5_pw;
 
-CREATE USER postgrex_cleartext_pw WITH PASSWORD 'postgrex_cleartext_pw';
-CREATE USER postgrex_md5_pw WITH PASSWORD 'postgrex_md5_pw';
+CREATE USER postgrex_cleartext_pw WITH (password='postgrex_cleartext_pw');
+CREATE USER postgrex_md5_pw WITH (password='postgrex_md5_pw');
 
 DROP TABLE IF EXISTS composite1;
-CREATE TABLE composite1 (a int, b text);
+CREATE TABLE composite1 (a int, b string);
 
 DROP TABLE IF EXISTS composite2;
 CREATE TABLE composite2 (a int, b int, c int);
 
-DROP TYPE IF EXISTS enum1;
-CREATE TYPE enum1 AS ENUM ('elixir', 'erlang');
+--DROP TYPE IF EXISTS enum1;
+--CREATE TYPE enum1 AS ENUM ('elixir', 'erlang');
 
-CREATE TABLE uniques (a int UNIQUE);
+--CREATE TABLE uniques (a int UNIQUE);
 
 DROP TABLE IF EXISTS missing_oid;
-DROP TYPE IF EXISTS missing_enum;
-DROP TYPE IF EXISTS missing_comp;
+--DROP TYPE IF EXISTS missing_enum;
+--DROP TYPE IF EXISTS missing_comp;
 
-CREATE TABLE altering (a int2);
+--CREATE TABLE altering (a int2);
 
-CREATE TABLE calendar (a timestamp without time zone, b timestamp with time zone);
+--CREATE TABLE calendar (a timestamp without time zone, b timestamp with time zone);
 
-DROP DOMAIN IF EXISTS points_domain;
-CREATE DOMAIN points_domain AS point[] CONSTRAINT is_populated CHECK (COALESCE(array_length(VALUE, 1), 0) >= 1);
+--DROP DOMAIN IF EXISTS points_domain;
+--CREATE DOMAIN points_domain AS point[] CONSTRAINT is_populated CHECK (COALESCE(array_length(VALUE, 1), 0) >= 1);
 
-DROP DOMAIN IF EXISTS floats_domain;
-CREATE DOMAIN floats_domain AS float[] CONSTRAINT is_populated CHECK (COALESCE(array_length(VALUE, 1), 0) >= 1);
+--DROP DOMAIN IF EXISTS floats_domain;
+--CREATE DOMAIN floats_domain AS float[] CONSTRAINT is_populated CHECK (COALESCE(array_length(VALUE, 1), 0) >= 1);
 """
 
 sql_with_schemas = """
-DROP SCHEMA IF EXISTS test;
-CREATE SCHEMA test;
+--DROP SCHEMA IF EXISTS test;
+--CREATE SCHEMA test;
 """
 
 cmds = [
-  ["-c", "DROP DATABASE IF EXISTS postgrex_test;"],
-  ["-c", "DROP DATABASE IF EXISTS postgrex_test_with_schemas;"],
-  ["-c", "CREATE DATABASE postgrex_test TEMPLATE=template0 ENCODING='UTF8' LC_COLLATE='en_US.UTF-8' LC_CTYPE='en_US.UTF-8';"],
-  ["-c", "CREATE DATABASE postgrex_test_with_schemas TEMPLATE=template0 ENCODING='UTF8' LC_COLLATE='en_US.UTF-8' LC_CTYPE='en_US.UTF-8';"],
+#CRATE  ["-c", "DROP DATABASE IF EXISTS postgrex_test;"],
+#CRATE  ["-c", "DROP DATABASE IF EXISTS postgrex_test_with_schemas;"],
+#CRATE  ["-c", "CREATE DATABASE postgrex_test TEMPLATE=template0 ENCODING='UTF8' LC_COLLATE='en_US.UTF-8' LC_CTYPE='en_US.UTF-8';"],
+#CRATE  ["-c", "CREATE DATABASE postgrex_test_with_schemas TEMPLATE=template0 ENCODING='UTF8' LC_COLLATE='en_US.UTF-8' LC_CTYPE='en_US.UTF-8';"],
   ["-d", "postgrex_test", "-c", sql],
   ["-d", "postgrex_test_with_schemas", "-c", sql_with_schemas]
 ]
@@ -98,13 +98,13 @@ pg_path = System.get_env("PGPATH")
 
 cmds =
   cond do
-    !pg_version || pg_version >= {9, 1} ->
-      cmds ++ [["-d", "postgrex_test_with_schemas", "-c", "CREATE EXTENSION IF NOT EXISTS hstore WITH SCHEMA test;"],
-               ["-d", "postgrex_test", "-c", "CREATE EXTENSION IF NOT EXISTS hstore;"]]
-    pg_version == {9, 0} ->
-      cmds ++ [["-d", "postgrex_test", "-f", "#{pg_path}/contrib/hstore.sql"]]
-    pg_version < {9, 0} ->
-      cmds ++ [["-d", "postgrex_test", "-c", "CREATE LANGUAGE plpgsql;"]]
+#    !pg_version || pg_version >= {9, 1} ->
+#      cmds ++ [["-d", "postgrex_test_with_schemas", "-c", "CREATE EXTENSION IF NOT EXISTS hstore WITH SCHEMA test;"],
+#               ["-d", "postgrex_test", "-c", "CREATE EXTENSION IF NOT EXISTS hstore;"]]
+#    pg_version == {9, 0} ->
+#      cmds ++ [["-d", "postgrex_test", "-f", "#{pg_path}/contrib/hstore.sql"]]
+#    pg_version < {9, 0} ->
+#      cmds ++ [["-d", "postgrex_test", "-c", "CREATE LANGUAGE plpgsql;"]]
     true ->
       cmds
 end
